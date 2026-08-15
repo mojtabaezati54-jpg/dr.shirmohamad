@@ -1,0 +1,44 @@
+Project DataPulse_Team2 {
+  database_type: "PostgreSQL"
+  Note: "Team 2 - Store and Products subsystem"
+}
+
+Table stores {
+  store_id bigint [pk, increment]
+  name varchar(150) [not null, unique]
+  description text
+  owner_user_id bigint [not null]
+  status varchar(20) [not null, default: 'active']
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table categories {
+  category_id bigint [pk, increment]
+  name varchar(100) [not null, unique]
+  description text
+  is_active boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table products {
+  product_id bigint [pk, increment]
+  store_id bigint [not null, ref: > stores.store_id]
+  category_id bigint [not null, ref: > categories.category_id]
+  name varchar(200) [not null]
+  description text
+  price_amount numeric(14,2) [not null]
+  currency_code char(3) [not null]
+  exchange_rate_to_irr numeric(18,6) [not null]
+  is_active boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table inventory {
+  inventory_id bigint [pk, increment]
+  product_id bigint [not null, unique, ref: > products.product_id]
+  quantity integer [not null, default: 0]
+  reorder_level integer [not null, default: 0]
+  updated_at timestamptz [not null, default: `now()`]
+}
+
+Ref: stores.owner_user_id > users.user_id [delete: restrict]
